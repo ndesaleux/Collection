@@ -47,9 +47,10 @@ abstract class CollectionAbstract implements \Iterator, \Countable
         return false;
     }
 
-    private function isValid($item) {
+    private function isValid($item)
+    {
         if ($item instanceof $this->className === false) {
-
+            throw InvalidItem::fromClass(get_class($item));
         }
         return true;
     }

@@ -9,5 +9,4 @@ interface CollectionInterface
     public function clean();
 
     public function has($item);
-
 }
