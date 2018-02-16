@@ -1,0 +1,26 @@
+{
+    "name": "ndesaleux/collection",
+    "description": "Provide classes to create easily Object collectio",
+    "type": "library",
+    "require-dev": {
+        "atoum/atoum": "^3.2",
+        "atoum/stubs": "^2.5",
+        "atoum/reports-extension": "^3.0",
+        "phpmetrics/phpmetrics": "^2.3",
+        "vimeo/psalm": "^0.3.93",
+        "sebastian/phpcpd": "^4.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Desaleux",
+            "email": "nicolas@desaleux.fr"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "ndesaleux\\": "src/"
+        }
+    }
+}

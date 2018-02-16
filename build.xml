@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="cleanProject" default="install">
+    <!-- overriden at call time -->
+    <property name="environment" value="dev" />
+    <property name="fullpath" value="./" />
+    <property name="php" value="/usr/bin/php" />
+    <property name="composer" value="/usr/bin/composer" />
+    <property name="composer_options" value="--no-interaction --prefer-source" />
+
+    <resolvepath propertyName="fullpath" file="${fullpath}"/>
+
+
+    <target name="composer">
+        <uptodate property="composer.notRequired" targetfile="vendor/autoload.php">
+            <fileset dir="${project.basedir}" includes="composer.*">
+            </fileset>
+        </uptodate>
+        <if>
+            <not><isset property="composer.notRequired"/></not>
+            <then>
+                <echo msg="Composer install" />
+                <exec command="export SYMFONY_ENV=${environment}; ${php} ${composer} install ${composer_options}" checkreturn="true" passthru="true" />
+            </then>
+        </if>
+    </target>
+
+    <target name="phpcs">
+        <php expression="include('vendor/autoload.php')"/>
+        <phpcodesniffer
+                standard="PSR2"
+                showSniffs="true"
+                showWarnings="true"
+                format="full"
+                haltonerror="true"
+                haltonwarning="true">
+            <fileset refid="srcFiles" />
+            <formatter type="full" outfile="php://stdout" />
+            <formatter type="gitblame" outfile="php://stdout" />
+        </phpcodesniffer>
+    </target>
+
+    <target name="phpmetrics">
+        <exec command="./vendor/phpmetrics/phpmetrics/bin/phpmetrics --report-html=./report/phpmetrics/report.html {fullpath}/src" />
+    </target>
+
+    <target name="phplint">
+        <phplint haltonfailure="true">
+            <fileset refid="srcFiles" />
+        </phplint>
+    </target>
+
+    <target name="check">
+        <phingcall target="phpcs" />
+        <phingcall target="phplint" />
+        <phingcall target="phpmetrics" />
+        <phingcall target="test" />
+    </target>
+
+    <target name="test">
+        <taskdef name="atoum" classpath="./vendor/atoum/atoum/resources/phing/" classname="AtoumTask"/>
+        <atoum
+                atoumpharpath="./vendor/atoum/atoum/bin/atoum"
+                bootstrap="./vendor/autoload.php"
+                codecoverage="true"
+                codecoveragereportextensionpath="./report/tests/coverage/"
+                codecoveragereportextensionurl="./report/tests/coverage/index.html"
+                showcodecoverage="true"
+                showmissingcodecoverage="true"
+                showprogress="true"
+                showmemory="true"
+                showduration="true">
+            <fileset dir="./tests/units">
+                <include name="**/*.php" />
+            </fileset>
+        </atoum>
+    </target>
+
+    <target name="install">
+        <phingcall target="composer" />
+    </target>
+
+    <fileset dir="src" id="srcFiles">
+        <include name="**/*.php" />
+    </fileset>
+</project>
