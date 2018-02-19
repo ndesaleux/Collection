@@ -7,9 +7,9 @@ class InvalidCollection extends \Exception
     /**
      * @return InvalidCollection
      */
-    public static function fromUnknownClass()
+    public static function fromUndefinedClass()
     {
-        return new self('A classname must be given to Collection constructor');
+        return new self('A collection must defined a classname');
     }
 
     /**
@@ -19,6 +19,6 @@ class InvalidCollection extends \Exception
      */
     public static function fromUnexistingClass($classname)
     {
-        return new self(sprintf('Classname "%s" is unknown', $classname));
+        return new self(sprintf('Classname "%s" is unknown from system', $classname));
     }
 }

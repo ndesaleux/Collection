@@ -2,7 +2,7 @@
 
 namespace ndesaleux\Collection;
 
-abstract class CollectionAbstract implements \Iterator, \Countable
+abstract class CollectionAbstract implements \Iterator, \Countable, CollectionInterface
 {
     protected $className = null;
     protected $items = [];
@@ -12,7 +12,7 @@ abstract class CollectionAbstract implements \Iterator, \Countable
     public function __construct()
     {
         if (trim($this->className) === '' || $this->className === null) {
-            throw InvalidCollection::fromUnknownClass();
+            throw InvalidCollection::fromUndefinedClass();
         }
         if (!class_exists($this->className)) {
             throw InvalidCollection::fromUnexistingClass($this->className);
@@ -31,18 +31,22 @@ abstract class CollectionAbstract implements \Iterator, \Countable
         $this->items = [];
     }
 
+    /**
+     * @param mixed $item
+     *
+     * @return bool
+     */
     public function has($item)
     {
         try {
             $this->isValid($item);
-            do {
+            while ($this->valid()) {
                 if ($item == $this->current()) {
-                    $this->rewind();
                     return true;
                 }
                 $this->next();
-            } while ($this->valid());
-        } catch (\Exception $e) {
+            }
+        } catch (InvalidItem $e) {
         }
         return false;
     }
@@ -50,7 +54,7 @@ abstract class CollectionAbstract implements \Iterator, \Countable
     private function isValid($item)
     {
         if ($item instanceof $this->className === false) {
-            throw InvalidItem::fromClass(get_class($item));
+            throw InvalidItem::fromClass(get_class($item), $this->className);
         }
         return true;
     }
