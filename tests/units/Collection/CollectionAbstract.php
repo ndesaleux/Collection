@@ -16,7 +16,7 @@ class CollectionAbstract extends \atoum
         $this
             ->class(\ndesaleux\Collection\CollectionAbstract::class)
                 ->isAbstract()
-                ->implements(\Iterator::class)
+                ->implements(\IteratorAggregate::class)
                 ->implements(\Countable::class)
                 ->implements(CollectionInterface::class);
     }
@@ -139,7 +139,7 @@ class CollectionAbstract extends \atoum
             })
                 ->isInstanceOf(InvalidItem::class)
                     ->hasMessage(
-                        sprintf('item given is instance of "%s", "%s" needed', \stdClass::class, Track::class)
+                        sprintf('item given is not an instance of "%s"', Track::class)
                     );
     }
 
@@ -168,5 +168,29 @@ class CollectionAbstract extends \atoum
             ->given($collection = new Album())
                 ->integer($collection->count())
                     ->isEqualTo(0);
+    }
+
+    public function testNewCollectionThrowInvalidItemWhenGivenBadData()
+    {
+        $this
+            ->given($array = [1,2,3])
+            ->exception(function() use ($array){
+                $collection = new Album($array);
+            })
+                ->isInstanceOf(InvalidItem::class)
+                ->hasMessage(
+                    sprintf('item given is not an instance of "%s"', Track::class)
+                );
+    }
+
+    public function testNewCollectionHasItemWhenGivenValidData()
+    {
+        $this
+            ->given($track1 = new Track(uniqid('title'), uniqid('band')))
+            ->and($track2 = new Track(uniqid('title'), uniqid('band')))
+            ->and($array = [$track1, $track2])
+            ->and($collection = new Album($array))
+                ->integer(count($collection))
+                    ->isEqualTo(count($array));
     }
 }

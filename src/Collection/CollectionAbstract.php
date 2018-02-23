@@ -2,14 +2,23 @@
 
 namespace ndesaleux\Collection;
 
-abstract class CollectionAbstract implements \Iterator, \Countable, CollectionInterface
+abstract class CollectionAbstract implements \IteratorAggregate, \Countable, CollectionInterface
 {
     protected $className = null;
     protected $items = [];
 
     protected $position = 0;
 
-    protected $isInit = false;
+    public function __construct(iterable $iterable = null)
+    {
+        $this->init();
+        if ($iterable !== null) {
+            foreach($iterable as $item)
+            {
+                $this->push($item);
+            }
+        }
+    }
 
     private function init()
     {
@@ -43,57 +52,26 @@ abstract class CollectionAbstract implements \Iterator, \Countable, CollectionIn
      */
     public function has($item)
     {
-        try {
-            $this->hasGoodInstance($item);
-            while ($this->valid()) {
-                if ($item == $this->current()) {
-                    return true;
-                }
-                $this->next();
-            }
-        } catch (InvalidItem $e) {
-        }
-        return false;
+        return in_array($item, $this->items, true);
     }
 
     private function hasGoodInstance($item)
     {
-        if ($this->isInit === false) {
-            $this->init();
-        }
         if ($item instanceof $this->className === false) {
-            throw InvalidItem::fromClass(get_class($item), $this->className);
+            throw InvalidItem::fromWrongType($this->className);
         }
         return true;
-    }
-
-    public function current()
-    {
-        return $this->items[$this->position];
-    }
-
-    public function next()
-    {
-        ++$this->position;
-    }
-
-    public function rewind()
-    {
-        $this->position = 0;
-    }
-
-    public function key()
-    {
-        return $this->position;
-    }
-
-    public function valid()
-    {
-        return isset($this->items[$this->position]);
     }
 
     public function count()
     {
         return count($this->items);
+    }
+
+    public function getIterator()
+    {
+        foreach($this->items as $item) {
+            yield $item;
+        }
     }
 }

@@ -5,13 +5,12 @@ namespace ndesaleux\Collection;
 class InvalidItem extends \Exception
 {
     /**
-     * @param string $classname
      * @param string $neededClassname
      *
      * @return InvalidItem
      */
-    public static function fromClass($classname, $neededClassname)
+    public static function fromWrongType($neededClassname)
     {
-        return new self(sprintf('item given is instance of "%s", "%s" needed', $classname, $neededClassname));
+        return new self(sprintf('item given is not an instance of "%s"', $neededClassname));
     }
 }

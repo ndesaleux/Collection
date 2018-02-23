@@ -1,6 +1,6 @@
 {
     "name": "ndesaleux/collection",
-    "description": "Provide classes to create easily Object collectio",
+    "description": "Provide classes to create easily Object collection",
     "type": "library",
     "require-dev": {
         "atoum/atoum": "^3.2",
