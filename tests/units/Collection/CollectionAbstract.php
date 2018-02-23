@@ -26,6 +26,7 @@ class CollectionAbstract extends \atoum
         $this
             ->exception(function() {
                 $collection = new NullCollection();
+                $collection->has(new \StdClass());
             })
             ->hasMessage('A collection must defined a classname');
     }
@@ -35,6 +36,7 @@ class CollectionAbstract extends \atoum
         $this
             ->exception(function() {
                 $collection = new EmptyCollection();
+                $collection->has(new \StdClass());
             })
             ->hasMessage('A collection must defined a classname');
     }
@@ -44,6 +46,7 @@ class CollectionAbstract extends \atoum
         $this
             ->exception(function() {
                 $collection = new UnexistingCollection();
+                $collection->has(new \StdClass());
             })
             ->hasMessage('Classname "\unexisting\class" is unknown from system');
     }
@@ -58,12 +61,12 @@ class CollectionAbstract extends \atoum
                 ->isEqualTo(0)
             ->boolean($collection->has($track1))
                 ->isFalse()
-            ->if($collection->add($track1))
+            ->if($collection->push($track1))
                 ->integer($collection->count())
                     ->isEqualTo(1)
                 ->boolean($collection->has($track1))
                     ->isTrue()
-            ->if($collection->add($track2))
+            ->if($collection->push($track2))
                 ->integer($collection->count())
                     ->isEqualTo(2)
                 ->boolean($collection->has($track1))
@@ -78,7 +81,7 @@ class CollectionAbstract extends \atoum
             ->given($collection = new Album())
             ->and($track1 = new Track(uniqid('title'), uniqid('band')))
             ->and($element = new \stdClass())
-            ->and($collection->add($track1))
+            ->and($collection->push($track1))
                 ->boolean($collection->has($element))
                     ->isFalse();
     }
@@ -100,7 +103,7 @@ class CollectionAbstract extends \atoum
             ->and($nbItem = rand(1,50))
             ->and($track = new Track(uniqid('title'), uniqid('band')));
             for ($i=0; $i<$nbItem; $i++) {
-                $collection->add($track);
+                $collection->push($track);
             }
             $this
                 ->integer($collection->count())
@@ -116,7 +119,7 @@ class CollectionAbstract extends \atoum
             ->and($nbItem = rand(1,50))
             ->and($track = new Track(uniqid('title'), uniqid('band')));
         for ($i=0; $i<$nbItem; $i++) {
-            $collection->add($track);
+            $collection->push($track);
         }
         $this
             ->integer(count($collection))
@@ -132,7 +135,7 @@ class CollectionAbstract extends \atoum
             ->given($collection = new Album())
             ->and($track = new \stdClass())
             ->exception(function() use ($collection, $track){
-                $collection->add($track);
+                $collection->push($track);
             })
                 ->isInstanceOf(InvalidItem::class)
                     ->hasMessage(
@@ -147,9 +150,9 @@ class CollectionAbstract extends \atoum
             ->and($track1 = new Track(uniqid('title'), uniqid('title')))
             ->and($track2 = new Track(uniqid('title'), uniqid('title')))
             ->and($track3 = new Track(uniqid('title'), uniqid('title')))
-            ->and($collection->add($track1))
-            ->and($collection->add($track2))
-            ->and($collection->add($track3));
+            ->and($collection->push($track1))
+            ->and($collection->push($track2))
+            ->and($collection->push($track3));
 
         foreach($collection as $i => $item) {
             $varName = 'track' . ($i + 1);

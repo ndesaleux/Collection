@@ -4,7 +4,7 @@ namespace ndesaleux\Collection;
 
 interface CollectionInterface
 {
-    public function add($item);
+    public function push($item);
 
     public function clean();
 

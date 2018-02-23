@@ -9,7 +9,9 @@ abstract class CollectionAbstract implements \Iterator, \Countable, CollectionIn
 
     protected $position = 0;
 
-    public function __construct()
+    protected $isInit = false;
+
+    private function init()
     {
         if (trim($this->className) === '' || $this->className === null) {
             throw InvalidCollection::fromUndefinedClass();
@@ -17,11 +19,12 @@ abstract class CollectionAbstract implements \Iterator, \Countable, CollectionIn
         if (!class_exists($this->className)) {
             throw InvalidCollection::fromUnexistingClass($this->className);
         }
+        $this->isInit = true;
     }
 
-    public function add($item)
+    public function push($item)
     {
-        if ($this->isValid($item)) {
+        if ($this->hasGoodInstance($item)) {
             $this->items[] = $item;
         }
     }
@@ -32,14 +35,16 @@ abstract class CollectionAbstract implements \Iterator, \Countable, CollectionIn
     }
 
     /**
-     * @param mixed $item
+     * @param $item
      *
      * @return bool
+     *
+     * @throws InvalidCollection
      */
     public function has($item)
     {
         try {
-            $this->isValid($item);
+            $this->hasGoodInstance($item);
             while ($this->valid()) {
                 if ($item == $this->current()) {
                     return true;
@@ -51,8 +56,11 @@ abstract class CollectionAbstract implements \Iterator, \Countable, CollectionIn
         return false;
     }
 
-    private function isValid($item)
+    private function hasGoodInstance($item)
     {
+        if ($this->isInit === false) {
+            $this->init();
+        }
         if ($item instanceof $this->className === false) {
             throw InvalidItem::fromClass(get_class($item), $this->className);
         }
