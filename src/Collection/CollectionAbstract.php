@@ -9,13 +9,13 @@ abstract class CollectionAbstract implements \IteratorAggregate, \Countable, Col
 
     protected $position = 0;
 
-    public function __construct(iterable $iterable = null)
+    public function __construct(iterable $iterable = null, $strict = false)
     {
         $this->init();
         if ($iterable !== null) {
             foreach($iterable as $item)
             {
-                $this->push($item);
+                $this->push($item, $strict);
             }
         }
     }
@@ -31,10 +31,16 @@ abstract class CollectionAbstract implements \IteratorAggregate, \Countable, Col
         $this->isInit = true;
     }
 
-    public function push($item)
+    public function push($item, $strict = true)
     {
-        if ($this->hasGoodInstance($item)) {
-            $this->items[] = $item;
+        try {
+            if ($this->hasGoodInstance($item)) {
+                $this->items[] = $item;
+            }
+        } catch (InvalidItem $exception) {
+            if ($strict === true) {
+                throw $exception;
+            }
         }
     }
 

@@ -170,17 +170,13 @@ class CollectionAbstract extends \atoum
                     ->isEqualTo(0);
     }
 
-    public function testNewCollectionThrowInvalidItemWhenGivenBadData()
+    public function testNewCollectionIsEmptyWhenGivenBadData()
     {
         $this
             ->given($array = [1,2,3])
-            ->exception(function() use ($array){
-                $collection = new Album($array);
-            })
-                ->isInstanceOf(InvalidItem::class)
-                ->hasMessage(
-                    sprintf('item given is not an instance of "%s"', Track::class)
-                );
+            ->and($collection = new Album($array))
+            ->integer(count($collection))
+                ->isEqualTo(0);
     }
 
     public function testNewCollectionHasItemWhenGivenValidData()
@@ -192,5 +188,22 @@ class CollectionAbstract extends \atoum
             ->and($collection = new Album($array))
                 ->integer(count($collection))
                     ->isEqualTo(count($array));
+    }
+
+    public function testPushInNotStrictMode()
+    {
+        $this
+            ->given($track1 = new Track(uniqid('title'), uniqid('band')))
+            ->and($collection = new Album())
+            ->and($collection->push($track1, false))
+                ->boolean($collection->has($track1))
+                    ->isTrue()
+                ->integer(count($collection))
+                    ->isEqualTo(1)
+            ->and($collection->push('toto', false))
+                ->boolean($collection->has('toto'))
+                    ->isFalse()
+                ->integer(count($collection))
+                    ->isEqualTo(1);
     }
 }
