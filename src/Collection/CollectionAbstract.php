@@ -13,8 +13,7 @@ abstract class CollectionAbstract implements \IteratorAggregate, \Countable, Col
     {
         $this->init();
         if ($iterable !== null) {
-            foreach($iterable as $item)
-            {
+            foreach ($iterable as $item) {
                 $this->push($item, $strict);
             }
         }
@@ -76,7 +75,7 @@ abstract class CollectionAbstract implements \IteratorAggregate, \Countable, Col
 
     public function getIterator()
     {
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             yield $item;
         }
     }
